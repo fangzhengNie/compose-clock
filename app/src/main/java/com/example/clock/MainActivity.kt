@@ -80,7 +80,7 @@ fun ClockApp() {
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
 
-            //verticalArrangement = Arrangement.SpaceBetween,
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally){
             Spacer(modifier = Modifier.height(120.dp))
             Column(horizontalAlignment = Alignment.CenterHorizontally){
@@ -98,17 +98,33 @@ fun ClockApp() {
                     style=MaterialTheme.typography.bodyLarge
                 )
             }
-            Spacer(modifier = Modifier.weight(1f))
-            Button(
-                onClick = {showTimePicker=true},
-                modifier = Modifier.padding(bottom = 48.dp)
+            Spacer(modifier = Modifier.height(48.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ){
-                Text("设置闹钟")
+                Button(
+                    onClick = {showTimePicker=true},
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp)
+                ) {
+                    Text("设置闹钟")
+                }
+                Button(
+                    onClick = {
+                        val intent=Intent(context,AlarmListActivity::class.java)
+                        context.startActivity(intent)
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(48.dp)
+                ) {
+                    Text("查看所有闹钟")
+                }
             }
-            Button(onClick = {showAlarmList=!showAlarmList}){
-                Text(if(showAlarmList)"隐藏闹钟列表" else "查看所有闹钟")
-            }
-
         }
         //Text(text = time, fontSize = 48.sp, color = MaterialTheme.colorScheme.primary)
     }
@@ -129,6 +145,7 @@ fun ClockApp() {
             ).show()
         }
     }
+    /*
     if (showAlarmList) {
         val alarms = getAllAlarms(context)
         Column(modifier = Modifier.padding(top = 16.dp)) {
@@ -141,6 +158,7 @@ fun ClockApp() {
             }
         }
     }
+     */
 }
 
 fun getCurrentTime(): String {
@@ -209,9 +227,14 @@ fun saveAlarmTime(context: Context, hour: Int, minute: Int) {
     editor.apply()
 }
 
-fun getAllAlarms(context: Context): List<String> {
+fun getAllAlarms(context: Context): Map<String, String> {
     val sharedPrefs = context.getSharedPreferences("alarms", Context.MODE_PRIVATE)
-    return sharedPrefs.all.values.map { it.toString() }
+    return sharedPrefs.all.mapValues { it.value.toString() }
+}
+
+fun deleteAlarm(context: Context, key: String) {
+    val sharedPrefs = context.getSharedPreferences("alarms", Context.MODE_PRIVATE)
+    sharedPrefs.edit().remove(key).apply()
 }
 
 
